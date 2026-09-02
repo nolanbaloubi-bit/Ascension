@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#7c3aed">
+
+    <title>ASCENSION</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>ASCENSION</h1>
+        <p>Classement des dessinateurs</p>
+    </header>
+
+    <a href="reglement.html" class="rules-button">
+    Règlement
+</a>
+
+    <main>
+        <section class="ranking">
+            <h2>Classement</h2>
+
+            <div id="ranking-list">
+                <!-- Les membres seront affichés ici par JavaScript -->
+            </div>
+        </section>
+    </main>
+
+
+<!-- PANNEAU DU MEMBRE -->
+<div id="member-modal" class="modal">
+
+    <div class="modal-content">
+
+        <button id="close-modal" class="close-modal">×</button>
+
+        <h2 id="modal-username">Pseudo</h2>
+
+        <div class="member-info">
+
+            <p>
+                Classe :
+                <span id="modal-class"></span>
+            </p>
+
+            <p>
+                Points :
+                <span id="modal-points"></span>
+            </p>
+
+            <p>
+                Victoires :
+                <span id="modal-wins"></span>
+            </p>
+
+            <p>
+                Défaites :
+                <span id="modal-losses"></span>
+            </p>
+
+        </div>
+
+        <h3>Historique des duels</h3>
+
+        <div id="modal-history">
+            Aucun duel enregistré.
+        </div>
+
+    </div>
+
+</div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>
+

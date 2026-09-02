@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ASCENSION — Administration</title>
+
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>ASCENSION</h1>
+        <p>Administration</p>
+    </header>
+
+    <main>
+
+
+<!-- GESTION DES MEMBRES -->
+<section class="admin-section">
+
+    <h2>Membres</h2>
+
+    <div id="members-list">
+        <!-- Les membres seront affichés ici -->
+    </div>
+
+    <button id="add-member-btn">
+        Ajouter un membre
+    </button>
+
+    <div id="add-member-form">
+
+        <div class="modal-form-content">
+
+            <h3>Ajouter un membre</h3>
+
+            <input
+                type="text"
+                id="new-member-username"
+                placeholder="Pseudo"
+            >
+
+            <input
+                type="number"
+                id="new-member-points"
+                placeholder="Points"
+                min="0"
+            >
+
+            <div class="modal-form-actions">
+
+                <button id="save-member-btn">
+                    Ajouter
+                </button>
+
+                <button id="cancel-member-btn">
+                    Annuler
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ENREGISTREMENT DES DUELS -->
+<section class="admin-section">
+
+    <button id="open-duel-btn" class="admin-module-btn" type="button">
+        Enregistrer un duel
+    </button>
+
+</section>
+
+<div id="duel-form-modal" class="admin-modal">
+
+    <div class="admin-modal-content">
+
+        <button id="close-duel-btn" class="admin-modal-close" type="button">
+            ×
+        </button>
+
+        <h2>Enregistrer un duel</h2>
+
+        <div class="duel-form">
+
+            <label for="duel-date">
+                Date
+            </label>
+
+            <input
+                type="date"
+                id="duel-date"
+            >
+
+            <label for="duel-format">
+                Format
+            </label>
+
+            <select id="duel-format">
+                <option value="1v1">1v1</option>
+                <option value="1v2">1v2</option>
+                <option value="2v2">2v2</option>
+                <option value="1v1v1">1v1v1</option>
+            </select>
+
+            <label for="duel-theme">
+                Thème
+            </label>
+
+            <input
+                type="text"
+                id="duel-theme"
+                placeholder="Thème du duel (facultatif)"
+            >
+
+            <div id="duel-participants">
+                <!-- Les participants seront ajoutés ici par JavaScript -->
+            </div>
+
+            <div id="duel-results">
+                <!-- Les résultats seront ajoutés ici par JavaScript -->
+            </div>
+
+            <button id="save-duel-btn" type="button">
+                Enregistrer le duel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>  
+
+
+ 
+<!-- GESTION DES TITRES -->
+<section class="admin-section">
+
+    <button id="open-titles-btn" class="admin-module-btn" type="button">
+        Titres
+    </button>
+
+</section>
+
+<div id="titles-modal" class="admin-modal">
+
+    <div class="admin-modal-content">
+
+        <button id="close-titles-btn" class="admin-modal-close" type="button">
+            ×
+        </button>
+
+        <h2>Titres</h2>
+
+        <div id="badges-list">
+            <!-- Les titres seront affichés ici -->
+        </div>
+
+    </div>
+
+</div>
+
+
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>
