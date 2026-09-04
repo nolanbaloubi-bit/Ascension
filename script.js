@@ -12,12 +12,32 @@ const supabaseClient = supabase.createClient(
 // ================================
 
 function getClass(points) {
-    if (points >= 300) return "🥇 [S]";
-    if (points >= 200) return "🥈 [A]";
-    if (points >= 150) return "🥉 [B]";
-    if (points >= 100) return "[C]";
-    if (points >= 50) return "[D]";
-    return "[E]";
+    if (points >= 300) return "S";
+    if (points >= 200) return "A";
+    if (points >= 150) return "B";
+    if (points >= 100) return "C";
+    if (points >= 50) return "D";
+    return "E";
+}
+function getClassBadge(points) {
+
+    const className = getClass(points);
+
+    const medals = {
+        S: "🥇",
+        A: "🥈",
+        B: "🥉",
+        C: "",
+        D: "",
+        E: ""
+    };
+
+    return `
+        <span class="class-badge class-${className}">
+            <span class="class-medal">${medals[className]}</span>
+            <span class="class-label">[${className}]</span>
+        </span>
+    `;
 }
 
 
@@ -126,9 +146,9 @@ async function loadRanking() {
 
             </div>
 
-            <span class="ranking-class">
-                ${getClass(member.points)}
-            </span>
+            <div class="ranking-class">
+    ${getClassBadge(member.points)}
+</div>
 
             <span class="ranking-points">
                 ${member.points} PT
@@ -146,6 +166,10 @@ loadRanking();
 
 function openMemberModal(member) {
 
+    const modal = document.getElementById("member-modal");
+
+    if (!modal) return;
+
     document.getElementById("modal-username").textContent =
         member.username;
 
@@ -161,8 +185,16 @@ function openMemberModal(member) {
     document.getElementById("modal-losses").textContent =
         "0";
 
-        loadMemberStats(member);
-    document.getElementById("member-modal").classList.add("active");
+    const historyContainer =
+        document.getElementById("modal-history");
+
+    if (historyContainer) {
+        historyContainer.innerHTML = "Chargement...";
+    }
+
+    modal.classList.add("active");
+
+    loadMemberStats(member);
 }
 
 
@@ -432,8 +464,8 @@ async function loadAdminMembers() {
                 </span>
 
                 <span class="admin-member-class">
-                    ${getClass(member.points)}
-                </span>
+    ${getClassBadge(member.points)}
+</span>
 
                 <span class="admin-member-points">
                     ${member.points} PT
