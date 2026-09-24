@@ -7,6 +7,17 @@ const supabaseClient = supabase.createClient(
 );
 
 
+
+
+
+supabaseClient.storage
+    .from("ascension-images")
+    .list("", { limit: 1 })
+    .then(({ data, error }) => {
+        console.log("TEST BUCKET :", data);
+        console.log("ERREUR BUCKET :", error);
+    });
+
 // ================================
 // CALCUL DE LA CLASSE
 // ================================
@@ -170,6 +181,30 @@ function openMemberModal(member) {
 
     if (!modal) return;
 
+
+
+    const memberCard =
+    document.getElementById("member-card");
+
+if (memberCard) {
+    memberCard.classList.remove(
+        "member-class-E",
+        "member-class-D",
+        "member-class-C",
+        "member-class-B",
+        "member-class-A",
+        "member-class-S"
+    );
+
+    memberCard.classList.add(
+        `member-class-${getClass(member.points)}`
+    );
+}
+
+
+
+
+
     document.getElementById("modal-username").textContent =
         member.username;
 
@@ -184,6 +219,17 @@ function openMemberModal(member) {
 
     document.getElementById("modal-losses").textContent =
         "0";
+const instagramLink =
+    document.getElementById("modal-instagram");
+
+if (instagramLink) {
+    if (member.instagram_url) {
+        instagramLink.href = member.instagram_url;
+        instagramLink.style.display = "inline";
+    } else {
+        instagramLink.style.display = "none";
+    }
+}
 
     const historyContainer =
         document.getElementById("modal-history");
@@ -194,9 +240,65 @@ function openMemberModal(member) {
 
     modal.classList.add("active");
 
-    loadMemberStats(member);
+loadMemberStats(member);
+loadMemberDrawings(member);
+
 }
 
+
+async function loadMemberDrawings(member) {
+
+    const drawingsContainer =
+        document.getElementById("modal-drawings");
+
+    if (!drawingsContainer) return;
+
+    drawingsContainer.innerHTML = "Chargement...";
+
+    const { data: drawings, error } =
+        await supabaseClient
+            .from("member_drawings")
+            .select("image_url, display_order")
+            .eq("member_id", member.id)
+            .order("display_order", { ascending: true });
+
+    if (error) {
+
+        console.error(
+            "Erreur chargement dessins :",
+            error
+        );
+
+        drawingsContainer.textContent =
+            "Impossible de charger les dessins.";
+
+        return;
+    }
+
+    drawingsContainer.innerHTML = "";
+
+    if (!drawings || drawings.length === 0) {
+
+        drawingsContainer.textContent =
+            "Aucun dessin enregistré.";
+
+        return;
+    }
+
+    drawings.forEach((drawing, index) => {
+
+        const image = document.createElement("img");
+
+        image.src = drawing.image_url;
+
+        image.alt =
+            `Dessin ${index + 1} de ${member.username}`;
+
+        image.classList.add("modal-drawing");
+
+        drawingsContainer.appendChild(image);
+    });
+}
 
 async function loadMemberStats(member) {
 
@@ -280,7 +382,7 @@ const memberIds = [
 const { data: members, error: membersError } =
     await supabaseClient
         .from("members")
-        .select("id, username")
+        .select("id, username, instagram_url")
         .in("id", memberIds);
 
 if (membersError) {
@@ -615,56 +717,356 @@ if (saveMemberBtn) {
 
 }
 
+const membersToggle =
+    document.getElementById("members-toggle");
 
+const membersModule =
+    document.getElementById("members-module");
+
+if (membersToggle && membersModule) {
+
+    membersToggle.addEventListener("click", () => {
+
+        membersModule.classList.toggle("active");
+
+    });
+
+}
 
 // ================================
 // ADMIN — MODIFIER UN MEMBRE
 // ================================
 
+let editingMember = null;
+let editingDrawings = [];
+
+
 async function editMember(member) {
 
-    const newUsername = prompt(
-        "Nouveau pseudo :",
-        member.username
-    );
+    editingMember = member;
 
-    if (newUsername === null) return;
+    document.getElementById("edit-member-username").value =
+        member.username || "";
 
-    const newPointsInput = prompt(
-        "Nouveaux points :",
-        member.points
-    );
+    document.getElementById("edit-member-points").value =
+        member.points ?? 0;
 
-    if (newPointsInput === null) return;
+    document.getElementById("edit-member-instagram").value =
+        member.instagram_url || "";
 
-    const newPoints = Number(newPointsInput);
+    editingDrawings = [];
 
-    if (!newUsername.trim()) {
-        alert("Le pseudo ne peut pas être vide.");
-        return;
-    }
-
-    if (Number.isNaN(newPoints) || newPoints < 0) {
-        alert("Nombre de points invalide.");
-        return;
-    }
-
-    const { error } = await supabaseClient
-        .from("members")
-        .update({
-            username: newUsername.trim(),
-            points: newPoints
-        })
-        .eq("id", member.id);
+    const { data, error } = await supabaseClient
+        .from("member_drawings")
+        .select("*")
+        .eq("member_id", member.id)
+        .order("display_order", { ascending: true });
 
     if (error) {
-        console.error("Erreur modification :", error);
-        alert("Impossible de modifier le membre.");
+        console.error("Erreur chargement dessins :", error);
+        alert("Impossible de charger les dessins.");
         return;
     }
 
-    loadAdminMembers();
-    loadRanking();
+    editingDrawings = data || [];
+
+    renderEditingDrawings();
+
+    document
+        .getElementById("edit-member-modal")
+        .classList.add("active");
+}
+
+function renderEditingDrawings() {
+
+    const container = document.getElementById("edit-member-drawings");
+
+    container.innerHTML = "";
+
+    editingDrawings.forEach((drawing, index) => {
+
+        const slot = document.createElement("div");
+        slot.className = "drawing-slot";
+
+        slot.innerHTML = `
+            <div class="drawing-preview">
+                <img src="${drawing.image_url}" alt="Dessin ${index + 1}">
+            </div>
+
+            <div class="drawing-buttons">
+
+                <button
+                    type="button"
+                    class="replace-drawing-btn"
+                    onclick="replaceDrawing(${index})"
+                >
+                    Remplacer
+                </button>
+
+                <button
+                    type="button"
+                    class="delete-drawing-btn"
+                    onclick="removeDrawing(${index})"
+                >
+                    Supprimer
+                </button>
+
+            </div>
+        `;
+
+        container.appendChild(slot);
+    });
+
+    if (editingDrawings.length < 3) {
+
+        const addSlot = document.createElement("div");
+        addSlot.className = "drawing-slot";
+
+        addSlot.innerHTML = `
+            <div class="drawing-preview">
+                <div class="drawing-empty">
+                    + Ajouter
+                </div>
+            </div>
+        `;
+
+        container.appendChild(addSlot);
+    }
+}
+
+
+function replaceDrawing(index) {
+
+    if (index < 0 || index >= editingDrawings.length) {
+        return;
+    }
+
+    const input = document.createElement("input");
+
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.addEventListener("change", async () => {
+
+        const file = input.files[0];
+
+        if (!file) return;
+
+        editingDrawings[index].newFile = file;
+        editingDrawings[index].replace = true;
+
+        renderEditingDrawings();
+    });
+
+    input.click();
+}
+
+
+function addDrawing() {
+
+    if (editingDrawings.length >= 3) {
+        alert("Un artiste peut avoir maximum 3 dessins.");
+        return;
+    }
+
+    const input = document.createElement("input");
+
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.addEventListener("change", async () => {
+
+        const file = input.files[0];
+
+        if (!file) return;
+
+        editingDrawings.push({
+            newFile: file,
+            image_url: null,
+            display_order: editingDrawings.length + 1
+        });
+
+        renderEditingDrawings();
+    });
+
+    input.click();
+}
+
+
+async function removeDrawing(index) {
+
+    if (index < 0 || index >= editingDrawings.length) {
+        return;
+    }
+
+    const drawing = editingDrawings[index];
+
+    // Si le dessin existe déjà dans le Storage
+    if (drawing.image_url) {
+
+        const oldPath =
+            getStoragePathFromUrl(drawing.image_url);
+
+        if (oldPath) {
+
+            const { error } =
+                await supabaseClient
+                    .storage
+                    .from("ascension-images")
+                    .remove([oldPath]);
+
+            if (error) {
+                console.error(
+                    "Erreur suppression image :",
+                    error
+                );
+
+                alert("Impossible de supprimer le dessin.");
+                return;
+            }
+        }
+    }
+
+    // Retirer le dessin de la liste
+    editingDrawings.splice(index, 1);
+
+    // Recalculer l'ordre
+    editingDrawings.forEach((drawing, i) => {
+        drawing.display_order = i + 1;
+    });
+
+    renderEditingDrawings();
+}
+
+document
+    .getElementById("add-drawing-btn")
+    .addEventListener("click", addDrawing);
+
+
+
+async function compressImage(file) {
+
+    const maxSize = 3 * 1024 * 1024; // 3 Mo
+
+    if (file.size <= maxSize) {
+        return file;
+    }
+
+    const image = new Image();
+
+    const objectUrl = URL.createObjectURL(file);
+
+    image.src = objectUrl;
+
+    await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = reject;
+    });
+
+    let width = image.width;
+    let height = image.height;
+
+    const maxDimension = 3000;
+
+    if (width > maxDimension || height > maxDimension) {
+
+        const ratio = Math.min(
+            maxDimension / width,
+            maxDimension / height
+        );
+
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+    }
+
+    const canvas = document.createElement("canvas");
+
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext("2d");
+
+    context.drawImage(
+        image,
+        0,
+        0,
+        width,
+        height
+    );
+
+    URL.revokeObjectURL(objectUrl);
+
+    let quality = 0.9;
+
+    while (quality >= 0.3) {
+
+        const blob = await new Promise(resolve => {
+
+            canvas.toBlob(
+                resolve,
+                "image/webp",
+                quality
+            );
+
+        });
+
+        if (blob && blob.size <= maxSize) {
+
+            return new File(
+                [blob],
+                "drawing.webp",
+                {
+                    type: "image/webp"
+                }
+            );
+        }
+
+        quality -= 0.1;
+    }
+
+    // Si l'image est encore trop lourde,
+    // on réduit progressivement sa résolution.
+
+    let currentWidth = width;
+    let currentHeight = height;
+
+    while (true) {
+
+        currentWidth = Math.round(currentWidth * 0.8);
+        currentHeight = Math.round(currentHeight * 0.8);
+
+        canvas.width = currentWidth;
+        canvas.height = currentHeight;
+
+        context.drawImage(
+            image,
+            0,
+            0,
+            currentWidth,
+            currentHeight
+        );
+
+        const blob = await new Promise(resolve => {
+
+            canvas.toBlob(
+                resolve,
+                "image/webp",
+                0.7
+            );
+
+        });
+
+        if (blob && blob.size <= maxSize) {
+
+            return new File(
+                [blob],
+                "drawing.webp",
+                {
+                    type: "image/webp"
+                }
+            );
+        }
+    }
 }
 
 
@@ -695,8 +1097,282 @@ async function deleteMember(member) {
     loadRanking();
 }
 
+async function uploadDrawing(file, memberId, drawingId) {
+
+    console.log("FICHIER À UPLOADER :", file);
+    console.log("TAILLE :", file?.size);
+    console.log("TYPE :", file?.type);
+
+    const filePath =
+        `members/${memberId}/test-${Date.now()}.webp`;
+
+    console.log("CHEMIN :", filePath);
+
+    const { data, error } = await supabaseClient
+        .storage
+        .from("ascension-images")
+        .upload(filePath, file, {
+            contentType: file.type || "image/webp",
+            upsert: false
+        });
+
+    console.log("UPLOAD DATA :", data);
+    console.log("UPLOAD ERROR :", error);
+
+    if (error) {
+        throw error;
+    }
+
+    const { data: publicUrlData } =
+        supabaseClient
+            .storage
+            .from("ascension-images")
+            .getPublicUrl(filePath);
+
+    console.log("URL :", publicUrlData.publicUrl);
+
+    return {
+        url: publicUrlData.publicUrl,
+        path: filePath
+    };
+}
+
+
+async function saveEditMember() {
+
+    if (!editingMember) return;
+
+    const usernameInput =
+        document.getElementById("edit-member-username");
+
+    const pointsInput =
+        document.getElementById("edit-member-points");
+
+    const instagramInput =
+        document.getElementById("edit-member-instagram");
+
+    const newUsername = usernameInput.value.trim();
+    const newPoints = Number(pointsInput.value);
+    const instagramUrl = instagramInput.value.trim();
+
+    if (!newUsername) {
+        alert("Le pseudo ne peut pas être vide.");
+        return;
+    }
+
+    if (Number.isNaN(newPoints) || newPoints < 0) {
+        alert("Nombre de points invalide.");
+        return;
+    }
+
+    const saveButton =
+        document.getElementById("save-edit-member-btn");
+
+    saveButton.disabled = true;
+    saveButton.textContent = "Enregistrement...";
+
+    try {
+
+        /* ========================= */
+        /* 1. MODIFIER LE MEMBRE     */
+        /* ========================= */
+
+        const { error: memberError } = await supabaseClient
+            .from("members")
+            .update({
+                username: newUsername,
+                points: newPoints,
+                instagram_url: instagramUrl || null
+            })
+            .eq("id", editingMember.id);
+
+        if (memberError) {
+            throw memberError;
+        }
+
+
+        /* ========================= */
+        /* 2. TRAITER LES DESSINS     */
+        /* ========================= */
+
+        const finalDrawings = [];
+
+        for (let i = 0; i < editingDrawings.length; i++) {
+
+            const drawing = editingDrawings[i];
+
+            /*
+             * Nouveau dessin ou dessin remplacé
+             */
+            if (drawing.newFile) {
+
+                const uploaded =
+                    await uploadDrawing(
+                        drawing.newFile,
+                        editingMember.id,
+                        i + 1
+                    );
+
+                /*
+                 * Si on remplace un ancien dessin,
+                 * on supprime l'ancien fichier du Storage.
+                 */
+                if (drawing.image_url) {
+
+                    const oldPath =
+                        getStoragePathFromUrl(
+                            drawing.image_url
+                        );
+
+                    if (oldPath) {
+
+                        await supabaseClient
+                            .storage
+                            .from("ascension-images")
+                            .remove([oldPath]);
+                    }
+                }
+
+                finalDrawings.push({
+                    image_url: uploaded.url,
+                    display_order: i + 1
+                });
+
+            } else {
+
+                /*
+                 * Dessin déjà existant
+                 */
+                finalDrawings.push({
+                    image_url: drawing.image_url,
+                    display_order: i + 1
+                });
+            }
+        }
+
+
+        /* ========================= */
+        /* 3. SUPPRIMER LES ANCIENS  */
+        /* ========================= */
+
+        const { error: deleteError } = await supabaseClient
+            .from("member_drawings")
+            .delete()
+            .eq("member_id", editingMember.id);
+
+        if (deleteError) {
+            throw deleteError;
+        }
+
+
+        /* ========================= */
+        /* 4. RÉINSÉRER LES DESSINS   */
+        /* ========================= */
+
+        if (finalDrawings.length > 0) {
+
+            const drawingsToInsert =
+                finalDrawings.map(drawing => ({
+                    member_id: editingMember.id,
+                    image_url: drawing.image_url,
+                    display_order: drawing.display_order
+                }));
+
+            const { error: insertError } =
+                await supabaseClient
+                    .from("member_drawings")
+                    .insert(drawingsToInsert);
+
+            if (insertError) {
+                throw insertError;
+            }
+        }
+
+
+        /* ========================= */
+        /* 5. FERMER LA FENÊTRE       */
+        /* ========================= */
+
+        document
+            .getElementById("edit-member-modal")
+            .classList.remove("active");
+
+        editingMember = null;
+        editingDrawings = [];
+
+
+        /* ========================= */
+        /* 6. ACTUALISER L'ADMIN     */
+        /* ========================= */
+
+        loadAdminMembers();
+        loadRanking();
+
+        alert("Membre modifié avec succès.");
+
+    } catch (error) {
+
+        console.error(
+            "Erreur enregistrement membre :",
+            error
+        );
+
+        alert(
+            "Une erreur est survenue pendant l'enregistrement."
+        );
+
+    } finally {
+
+        saveButton.disabled = false;
+        saveButton.textContent = "Enregistrer";
+    }
+}
+
+function getStoragePathFromUrl(url) {
+
+    if (!url) return null;
+
+    const marker =
+        "/storage/v1/object/public/ascension-images/";
+
+    const index = url.indexOf(marker);
+
+    if (index === -1) {
+        return null;
+    }
+
+    return decodeURIComponent(
+        url.substring(index + marker.length)
+    );
+}
+
+document
+    .getElementById("save-edit-member-btn")
+    .addEventListener("click", saveEditMember);
 
 // ================================
+
+
+function closeEditMemberModal() {
+
+    document
+        .getElementById("edit-member-modal")
+        .classList.remove("active");
+
+    editingMember = null;
+    editingDrawings = [];
+}
+
+
+document
+    .getElementById("cancel-edit-member-btn")
+    .addEventListener("click", closeEditMemberModal);
+
+
+document
+    .getElementById("close-edit-member-btn")
+    .addEventListener("click", closeEditMemberModal);
+
 // ADMIN — PARTICIPANTS DU DUEL
 // ================================
 

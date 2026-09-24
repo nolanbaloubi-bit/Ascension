@@ -22,17 +22,29 @@
 
 
 <!-- GESTION DES MEMBRES -->
-<section class="admin-section">
+<section class="admin-section admin-module" id="members-module">
 
-    <h2>Membres</h2>
+    <button
+        type="button"
+        class="module-header"
+        id="members-toggle"
+    >
+        <h2>Membres</h2>
 
-    <div id="members-list">
-        <!-- Les membres seront affichés ici -->
-    </div>
-
-    <button id="add-member-btn">
-        Ajouter un membre
+        <span class="module-arrow">
+            ▼
+        </span>
     </button>
+
+    <div class="module-content">
+
+        <div id="members-list">
+            <!-- Les membres seront affichés ici -->
+        </div>
+
+        <button id="add-member-btn">
+            Ajouter un membre
+        </button>
 
     <div id="add-member-form">
 
@@ -71,6 +83,92 @@
 
 </section>
 
+
+<!-- MODIFICATION D'UN MEMBRE -->
+<div id="edit-member-modal" class="admin-modal">
+
+    <div class="admin-modal-content edit-member-content">
+
+        <button
+            id="close-edit-member-btn"
+            class="admin-modal-close"
+            type="button"
+        >
+            ×
+        </button>
+
+        <h2>Modifier un membre</h2>
+
+        <div class="edit-member-form">
+
+            <label for="edit-member-username">
+                Pseudo
+            </label>
+
+            <input
+                type="text"
+                id="edit-member-username"
+                placeholder="Pseudo"
+            >
+
+            <label for="edit-member-points">
+                Points
+            </label>
+
+            <input
+                type="number"
+                id="edit-member-points"
+                min="0"
+                placeholder="Points"
+            >
+
+            <label for="edit-member-instagram">
+                Instagram
+            </label>
+
+            <input
+                type="url"
+                id="edit-member-instagram"
+                placeholder="https://instagram.com/..."
+            >
+
+            <h3>Dessins</h3>
+
+            <div id="edit-member-drawings">
+                <!-- Les dessins seront générés par JavaScript -->
+            </div>
+
+            <button
+                id="add-drawing-btn"
+                type="button"
+                class="add-drawing-btn"
+            >
+                + Ajouter un dessin
+            </button>
+
+            <div class="edit-member-actions">
+
+                <button
+                    id="cancel-edit-member-btn"
+                    type="button"
+                >
+                    Annuler
+                </button>
+
+                <button
+                    id="save-edit-member-btn"
+                    type="button"
+                >
+                    Enregistrer
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 
 <!-- ENREGISTREMENT DES DUELS -->
