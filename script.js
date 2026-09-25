@@ -111,9 +111,9 @@ async function loadRanking() {
         });
 
         memberElement.innerHTML = `
-            <span class="ranking-position">
-                #${index + 1}
-            </span>
+            <span class="ranking-position class-${getClass(member.points)}">
+    ★${index + 1}
+</span>
 
             <div class="ranking-member-main">
 
@@ -2408,3 +2408,39 @@ duelModal?.addEventListener("click", (event) => {
     }
 
 });
+
+
+
+const starsContainer =
+    document.getElementById("ascension-stars");
+
+if (starsContainer) {
+
+    const starCount =
+        Math.random() < 0.5 ? 3 : 5;
+
+    for (let i = 0; i < starCount; i++) {
+
+        const star =
+            document.createElement("span");
+
+        star.className =
+            "ascension-star";
+
+        star.textContent = "★";
+
+        star.style.left =
+            `${Math.random() * 100}%`;
+
+        star.style.top =
+            `${Math.random() * 100}%`;
+
+        star.style.fontSize =
+            `${12 + Math.random() * 12}px`;
+
+        star.style.opacity =
+            `${0.2 + Math.random() * 0.25}`;
+
+        starsContainer.appendChild(star);
+    }
+}

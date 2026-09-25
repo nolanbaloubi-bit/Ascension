@@ -8,6 +8,17 @@ body {
     font-family: Arial, sans-serif;
     background: #f4f4f4;
     color: #111;
+    
+}
+
+.ranking-position {
+    color: #D61F69;
+}
+
+.ranking h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #D61F69;
 }
 
 header {
@@ -20,6 +31,7 @@ header {
 header h1 {
     font-size: 42px;
     letter-spacing: 4px;
+    color: #D61F69;
 }
 
 header p {
@@ -42,6 +54,7 @@ main {
 .ranking h2 {
     margin-bottom: 20px;
     font-size: 24px;
+    color: #D61F69;
 }
 
 #ranking-list {
@@ -1841,7 +1854,7 @@ body.duel-modal-open {
     padding: 7px 18px;
 
     color: #D61F69;
-    background: transparent;
+    background: #FCE7F3;
 
     border: 1px solid #D61F69;
     border-radius: 6px;
@@ -1895,4 +1908,91 @@ body.modal-open {
 
 .modal-content {
     overscroll-behavior: contain;
+}
+
+
+body {
+    background: #EEF7FF;
+}
+
+
+#ascension-stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.ascension-star {
+    position: absolute;
+    color: #D61F69;
+    font-size: 18px;
+    opacity: 0.35;
+}
+
+body > *:not(#ascension-stars) {
+    position: relative;
+    z-index: 1;
+}
+
+.ascension-star {
+    position: absolute;
+    color: #D61F69;
+    font-size: 18px;
+    opacity: 0.35;
+}
+
+
+header {
+    background: #243447;
+}
+
+.ascension-title {
+    color: #5DADE2;
+}
+
+.ascension-title span {
+    color: #D61F69;
+    font-size: 28px;
+    margin: 0 8px;
+}
+
+
+.ranking-position.class-E {
+    color: #374151;
+}
+
+.ranking-position.class-D {
+    color: #2563EB;
+}
+
+.ranking-position.class-C {
+    color: #16A34A;
+}
+
+.ranking-position.class-B {
+    color: #EA580C;
+}
+
+.ranking-position.class-A {
+    color: #7C3AED;
+}
+
+.ranking-position.class-S {
+    color: #D49A00;
+}
+
+
+.ranking h2 {
+    color: #D61F69 !important;
+}
+
+.league-title {
+    color: #D61F69;
+}
+
+.league-title {
+    color: #D61F69;
+    font-size: 15px;
 }
