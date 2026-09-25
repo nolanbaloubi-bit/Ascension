@@ -1931,9 +1931,12 @@ body {
     opacity: 0.35;
 }
 
-body > *:not(#ascension-stars) {
-    position: relative;
-    z-index: 1;
+#ascension-stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
 }
 
 .ascension-star {
@@ -1995,4 +1998,19 @@ header {
 .league-title {
     color: #D61F69;
     font-size: 15px;
+}
+
+.ascension-title {
+    white-space: nowrap;
+}
+
+@media (max-width: 400px) {
+    .ascension-title {
+        font-size: 22px;
+    }
+
+    .ascension-title span {
+        font-size: 20px;
+        margin: 0 5px;
+    }
 }
