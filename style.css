@@ -662,7 +662,15 @@ main {
 
 #modal-history {
     display: grid;
-    gap: 10px;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.history-item {
+    padding: 7px 9px;
+    font-size: 12px;
+    border-radius: 7px;
+    line-height: 1.3;
 }
 
 .class-badge {
@@ -1579,4 +1587,312 @@ main {
     .member-info p span {
         font-size: 13px;
     }
+}
+
+#modal-history .history-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 10px !important;
+}
+
+#modal-history .history-item strong {
+    font-size: 11px;
+}
+
+#modal-history .history-main {
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+#modal-history .history-theme {
+    font-size: 11px;
+    line-height: 1.3;
+    opacity: 0.75;
+}
+
+@media (max-width: 600px) {
+    #modal-history .history-item {
+        padding: 7px 8px !important;
+    }
+
+    #modal-history .history-main {
+        font-size: 11px;
+    }
+
+    #modal-history .history-theme {
+        font-size: 10px;
+    }
+}
+
+.duel-event-btn {
+    display: block;
+    width: fit-content;
+    margin: 10px auto;
+    text-decoration: none;
+}
+
+
+/* =========================
+   POPUP DUEL
+   ========================= */
+
+.duel-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    padding: 25px 15px;
+
+    overflow-y: auto;
+}
+
+.duel-modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.duel-modal-content {
+    position: relative;
+
+    width: min(650px, 100%);
+
+    margin: 30px auto;
+
+    padding: 25px;
+
+    background: #fff;
+
+    border: 3px solid #dc2626;
+    border-radius: 16px;
+
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+}
+
+.duel-modal-content h2 {
+    margin: 0 45px 8px 0;
+    color: #dc2626;
+}
+
+.duel-modal-content h3 {
+    margin: 25px 0 10px;
+}
+
+.duel-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+
+    width: 35px;
+    height: 35px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #fee2e2;
+    color: #b91c1c;
+
+    font-size: 24px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.duel-event-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+
+    margin-top: 20px;
+}
+
+.duel-event-info div {
+    padding: 11px 8px;
+
+    text-align: center;
+
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
+}
+
+.duel-event-info span {
+    display: block;
+
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.duel-event-info strong {
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 14px;
+}
+
+#duel-modal-status {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 7px;
+
+    background: #fee2e2;
+    color: #b91c1c;
+
+    font-size: 12px;
+    font-weight: bold;
+}
+
+#duel-modal-participants,
+#duel-modal-matches {
+    display: grid;
+    gap: 8px;
+}
+
+.duel-modal-participant,
+.duel-modal-match {
+    padding: 10px 12px;
+
+    background: #fafafa;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.duel-modal-participant {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.duel-modal-match {
+    font-size: 13px;
+}
+
+.duel-modal-match strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.duel-modal-match span {
+    display: block;
+    color: #666;
+    margin-top: 3px;
+}
+
+body.duel-modal-open {
+    overflow: hidden;
+}
+
+@media (max-width: 600px) {
+
+    .duel-modal {
+        padding: 10px;
+    }
+
+    .duel-modal-content {
+        margin: 10px auto;
+        padding: 20px 15px;
+    }
+
+    .duel-event-info {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+    }
+
+    .duel-event-info div {
+        padding: 9px 4px;
+    }
+
+    .duel-event-info strong {
+        font-size: 12px;
+    }
+}
+
+
+/* Bouton Duel lorsqu'un événement est actif */
+.duel-event-btn.event-active {
+    color: #dc2626;
+    font-weight: bold;
+}
+
+.duel-event-btn.event-active #duel-event-notification {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-left: 6px;
+    vertical-align: middle;
+    background: #dc2626;
+    border-radius: 50%;
+}
+
+
+
+.duel-event-btn {
+    display: block;
+    width: fit-content;
+    margin: 12px auto 8px;
+
+    padding: 7px 18px;
+
+    color: #D61F69;
+    background: transparent;
+
+    border: 1px solid #D61F69;
+    border-radius: 6px;
+
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+
+    text-decoration: none;
+
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.duel-event-btn:hover {
+    background: #D61F69;
+    color: white;
+}
+
+.duel-event-btn.event-active {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: white;
+}
+
+.duel-event-btn.event-active:hover {
+    background: #b91c1c;
+    border-color: #b91c1c;
+}
+
+.duel-event-btn.event-active #duel-event-notification {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-left: 7px;
+    vertical-align: middle;
+
+    background: white;
+    border-radius: 50%;
+}
+
+
+
+
+body.modal-open {
+    overflow: hidden;
+}
+
+.modal {
+    overscroll-behavior: contain;
+}
+
+.modal-content {
+    overscroll-behavior: contain;
 }

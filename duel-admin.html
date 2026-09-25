@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>ASCENSION — Événement Duel</title>
+
+    <link
+        rel="stylesheet"
+        href="duel-admin.css"
+    >
+</head>
+
+<body>
+
+    <header>
+
+        <h1>ASCENSION</h1>
+
+        <p>
+            Gestion de l'événement duel
+        </p>
+
+    </header>
+
+
+    <main>
+
+        <a
+            href="admin.html"
+            class="back-button"
+        >
+            ← Retour à l'administration
+        </a>
+
+
+        <!-- =========================================
+             ÉVÉNEMENT
+        ========================================== -->
+
+        <section class="event-admin">
+
+            <div class="event-admin-header">
+
+                <h2>
+                    Événement Duel
+                </h2>
+
+                <span
+                    id="event-status"
+                    class="status-badge"
+                >
+                    Aucun événement
+                </span>
+
+            </div>
+
+
+            <div class="event-form">
+
+                <label for="event-name">
+                    Nom de l'événement
+                </label>
+
+                <input
+                    type="text"
+                    id="event-name"
+                    placeholder="Ex : Guerre des territoires"
+                >
+
+
+                <label for="event-theme">
+                    Thème général
+                </label>
+
+                <input
+                    type="text"
+                    id="event-theme"
+                    placeholder="Ex : Territoire"
+                >
+
+
+                <label for="event-stake">
+                    Mise totale
+                </label>
+
+                <input
+                    type="number"
+                    id="event-stake"
+                    min="0"
+                    placeholder="Ex : 40"
+                >
+
+
+                <label for="event-min-participants">
+                    Nombre minimum de participants
+                </label>
+
+                <input
+                    type="number"
+                    id="event-min-participants"
+                    min="2"
+                    placeholder="Ex : 8"
+                >
+
+
+                <!-- =================================
+                     STATUT
+                ================================== -->
+
+                <label
+                    for="event-status-select"
+                >
+                    Statut de l'événement
+                </label>
+
+                <select
+                    id="event-status-select"
+                >
+
+                    <option value="draft">
+                        Brouillon
+                    </option>
+
+                    <option value="active">
+                        Actif
+                    </option>
+
+                    <option value="finished">
+                        Terminé
+                    </option>
+
+                </select>
+
+
+                <button
+                    id="save-event-btn"
+                    type="button"
+                >
+                    Créer l'événement
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             PARTICIPANTS
+        ========================================== -->
+
+        <section
+            class="event-admin participants-admin"
+        >
+
+            <div class="event-admin-header">
+
+                <h2>
+                    Participants
+                </h2>
+
+            </div>
+
+
+            <div id="participants-list">
+
+                <p>
+                    Aucun participant enregistré.
+                </p>
+
+            </div>
+
+
+            <div class="participant-form">
+
+                <h3>
+                    Ajouter un participant
+                </h3>
+
+
+                <label for="participant-select">
+                    Membre
+                </label>
+
+
+                <select id="participant-select">
+
+                    <option value="">
+                        Sélectionner un membre
+                    </option>
+
+                </select>
+
+
+                <button
+                    id="add-participant-btn"
+                    type="button"
+                >
+                    Ajouter le participant
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             PETITS DUELS
+        ========================================== -->
+
+        <section
+            class="event-admin matches-admin"
+        >
+
+            <div class="event-admin-header">
+
+                <h2>
+                    Petits duels
+                </h2>
+
+            </div>
+
+
+            <div id="matches-list">
+
+                <p>
+                    Aucun petit duel enregistré.
+                </p>
+
+            </div>
+
+
+            <div class="match-form">
+
+                <h3>
+                    Ajouter un petit duel
+                </h3>
+
+
+                <label for="match-format">
+                    Format
+                </label>
+
+                <select id="match-format">
+
+                    <option value="">
+                        Sélectionner un format
+                    </option>
+
+                    <option value="1v1">
+                        1v1
+                    </option>
+
+                    <option value="1v2">
+                        1v2
+                    </option>
+
+                    <option value="1v1v1">
+                        1v1v1
+                    </option>
+
+                    <option value="2v2">
+                        2v2
+                    </option>
+
+                    <option value="1v3">
+                        1v3
+                    </option>
+
+                    <option value="2v3">
+                        2v3
+                    </option>
+
+                    <option value="1v1v1v1">
+                        1v1v1v1
+                    </option>
+
+                </select>
+
+
+                <div
+                    id="match-participants-container"
+                >
+
+                    <p>
+                        Sélectionne d'abord un format.
+                    </p>
+
+                </div>
+
+
+                <label for="match-theme">
+                    Thème du duel
+                </label>
+
+                <input
+                    type="text"
+                    id="match-theme"
+                    placeholder="Thème du petit duel"
+                >
+
+
+                <label for="match-date">
+                    Date et heure
+                </label>
+
+                <input
+                    type="datetime-local"
+                    id="match-date"
+                >
+
+
+                <button
+                    id="add-match-btn"
+                    type="button"
+                >
+                    Ajouter le petit duel
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+    <script src="duel-admin.js"></script>
+
+</body>
+
+</html>

@@ -239,6 +239,7 @@ if (instagramLink) {
     }
 
     modal.classList.add("active");
+    document.body.classList.add("modal-open");
 
 loadMemberStats(member);
 loadMemberDrawings(member);
@@ -443,31 +444,23 @@ data.forEach(participation => {
         new Date(duel.date_duel).toLocaleDateString("fr-FR");
 
     historyItem.innerHTML = `
-        <strong>${date}</strong>
+    <strong>${date}</strong>
 
-        <span>
-            ${duel.format}
-        </span>
+    <div class="history-main">
+        ${duel.format}
+        vs ${opponents.join(", ")}
+        ${result}
+        ${points} PT
+    </div>
 
-        <span>
-            vs ${opponents.join(", ")}
-        </span>
-
-        <span>
-            ${result}
-        </span>
-
-        <span>
-            ${points} PT
-        </span>
-
-        ${
-            duel.theme
-                ? `<span>Thème : ${duel.theme}</span>`
-                : ""
-        }
-    `;
-
+    ${
+        duel.theme
+            ? `<div class="history-theme">
+                Thème : ${duel.theme}
+            </div>`
+            : ""
+    }
+`;
     historyContainer.appendChild(historyItem);
 });
 
@@ -481,9 +474,9 @@ const memberModal = document.getElementById("member-modal");
 if (closeModal && memberModal) {
     closeModal.addEventListener("click", () => {
         memberModal.classList.remove("active");
+        document.body.classList.remove("modal-open");
     });
 }
-    
 
 
 
@@ -494,11 +487,11 @@ if (memberModal) {
 
         if (event.target.id === "member-modal") {
             memberModal.classList.remove("active");
+            document.body.classList.remove("modal-open");
         }
 
     });
 }
-
 
 
 // ================================
@@ -940,7 +933,7 @@ async function removeDrawing(index) {
 
 document
     .getElementById("add-drawing-btn")
-    .addEventListener("click", addDrawing);
+    ?.addEventListener("click", addDrawing);
 
 
 
@@ -1348,7 +1341,7 @@ function getStoragePathFromUrl(url) {
 
 document
     .getElementById("save-edit-member-btn")
-    .addEventListener("click", saveEditMember);
+    ?.addEventListener("click", saveEditMember);
 
 // ================================
 
@@ -1365,13 +1358,12 @@ function closeEditMemberModal() {
 
 
 document
-    .getElementById("cancel-edit-member-btn")
-    .addEventListener("click", closeEditMemberModal);
-
+    .getElementById("save-edit-member-btn")
+    ?.addEventListener("click", saveEditMember);
 
 document
-    .getElementById("close-edit-member-btn")
-    .addEventListener("click", closeEditMemberModal);
+    .getElementById("save-edit-member-btn")
+    ?.addEventListener("click", saveEditMember);
 
 // ADMIN — PARTICIPANTS DU DUEL
 // ================================
@@ -1930,3 +1922,489 @@ if (closeTitlesBtn && titlesModal) {
     });
 
 }
+
+
+
+let currentDuelEvent = null;
+
+async function loadDuelEventButton() {
+
+    const button =
+        document.getElementById("duel-event-btn");
+
+    const notification =
+        document.getElementById(
+            "duel-event-notification"
+        );
+
+    if (!button) return;
+
+    const { data: event, error } =
+        await supabaseClient
+            .from("duel_events")
+            .select("*")
+            .eq("status", "active")
+            .order("created_at", {
+                ascending: false
+            })
+            .limit(1)
+            .maybeSingle();
+
+    if (error) {
+        console.error(
+            "Erreur chargement événement duel :",
+            error
+        );
+        return;
+    }
+
+    currentDuelEvent = event || null;
+    console.log("Événement actif trouvé :", event);
+
+    if (!event) {
+        button.classList.remove("event-active");
+
+        if (notification) {
+            notification.style.display = "none";
+        }
+
+        return;
+    }
+
+    button.classList.add("event-active");
+
+    if (notification) {
+        notification.style.display = "inline-block";
+    }
+}
+
+loadDuelEventButton();
+
+
+const duelEventButton =
+    document.getElementById("duel-event-btn");
+
+const duelModal =
+    document.getElementById("duel-modal");
+
+const closeDuelModal =
+    document.getElementById("close-duel-modal");
+
+
+duelEventButton?.addEventListener("click", async (event) => {
+
+    event.preventDefault();
+
+    if (!duelModal) return;
+
+    duelModal.classList.add("active");
+    document.body.classList.add("duel-modal-open");
+
+    const { data: eventData, error } =
+        await supabaseClient
+            .from("duel_events")
+            .select("*")
+            .eq("status", "active")
+            .order("created_at", {
+                ascending: false
+            })
+            .limit(1)
+            .maybeSingle();
+
+    if (error) {
+        console.error(
+            "Erreur chargement événement duel :",
+            error
+        );
+
+        return;
+    }
+
+if (!eventData) {
+
+    document.getElementById("duel-modal-name").textContent =
+        "Duel";
+
+    document.getElementById("duel-modal-status").textContent =
+        "AUCUN ÉVÉNEMENT";
+
+    document.getElementById("duel-modal-theme").textContent =
+        "—";
+
+    document.getElementById("duel-modal-stake").textContent =
+        "—";
+
+    document.getElementById("duel-modal-participant-count").textContent =
+        "0";
+
+    document.getElementById("duel-modal-participants").innerHTML =
+        "<p>Aucun événement en cours.</p>";
+}
+
+
+
+    document.getElementById("duel-modal-name").textContent =
+    eventData?.name || "Duel";
+
+    document.getElementById("duel-modal-status").textContent =
+        "ACTIF";
+
+    document.getElementById("duel-modal-theme").textContent =
+    eventData?.theme || "Aucun thème";
+
+    document.getElementById("duel-modal-stake").textContent =
+    eventData ? `${eventData.stake} PTS` : "—";
+
+
+        const participantsContainer =
+    document.getElementById("duel-modal-participants");
+
+const participantCount =
+    document.getElementById("duel-modal-participant-count");
+
+let participants = [];
+let participantsError = null;
+
+if (eventData) {
+
+    const result =
+        await supabaseClient
+            .from("duel_event_participants")
+            .select(`
+                id,
+                member_id,
+                members (
+                    username
+                )
+            `)
+            .eq("event_id", eventData.id)
+            .order("created_at", {
+                ascending: true
+            });
+
+    participants = result.data;
+    participantsError = result.error;
+}
+
+
+if (participantsError) {
+
+    console.error(
+        "Erreur chargement participants :",
+        participantsError
+    );
+
+    participantsContainer.textContent =
+        "Impossible de charger les participants.";
+
+} else {
+
+    participantCount.textContent =
+        `${participants.length}`;
+
+    participantsContainer.innerHTML = "";
+
+    if (participants.length === 0) {
+
+        participantsContainer.innerHTML =
+            "<p>Aucun participant.</p>";
+
+    } else {
+
+        participants.forEach(participant => {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "duel-modal-participant";
+
+            item.textContent =
+    participant.members?.username ||
+    "Participant inconnu";
+
+            participantsContainer.appendChild(item);
+
+        });
+    }
+}
+
+
+
+
+
+
+
+// ==================================================
+// CHARGER LES DUELS DE L'ÉVÉNEMENT
+// ==================================================
+
+const matchesContainer =
+    document.getElementById(
+        "duel-modal-matches"
+    );
+
+const {
+    data: matches,
+    error: matchesError
+} =
+    await supabaseClient
+        .from("duel_event_matches")
+        .select(`
+            id,
+            event_id,
+            format,
+            theme,
+            scheduled_at,
+            status,
+            winner_id,
+            cancel_reason,
+            duel_event_match_participants (
+                member_id,
+                team,
+                members (
+                    username
+                )
+            )
+        `)
+        .order(
+            "scheduled_at",
+            {
+                ascending: true
+            }
+        );
+
+
+if (matchesError) {
+
+    console.error(
+        "Erreur chargement duels :",
+        matchesError
+    );
+
+    matchesContainer.innerHTML =
+        "<p>Impossible de charger les duels.</p>";
+
+} else {
+
+    matchesContainer.innerHTML = "";
+
+    if (!matches || matches.length === 0) {
+
+        matchesContainer.innerHTML =
+            "<p>Aucun duel enregistré.</p>";
+
+    } else {
+
+        matches.forEach(match => {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "duel-modal-match";
+
+
+            // ==========================================
+            // ORGANISER LES PARTICIPANTS PAR ÉQUIPE
+            // ==========================================
+
+            const teams = {};
+
+            (
+                match.duel_event_match_participants ||
+                []
+            ).forEach(participant => {
+
+                const team =
+                    participant.team;
+
+                if (!teams[team]) {
+                    teams[team] = [];
+                }
+
+                teams[team].push(
+                    participant.members?.username ||
+                    "Participant inconnu"
+                );
+
+            });
+
+
+            const teamNames =
+                Object.keys(teams)
+                    .sort(
+                        (a, b) =>
+                            Number(a) -
+                            Number(b)
+                    )
+                    .map(team =>
+                        teams[team].join(" + ")
+                    );
+
+
+            const participantsDisplay =
+                teamNames.length > 1
+                    ? teamNames.join(" VS ")
+                    : (
+                        teamNames[0] ||
+                        "Aucun participant"
+                    );
+
+
+            // ==========================================
+            // STATUT
+            // ==========================================
+
+            const statusLabels = {
+
+                pending:
+                    "En attente",
+
+                active:
+                    "En cours",
+
+                finished:
+                    "Terminé",
+
+                cancelled:
+                    "Annulé"
+
+            };
+
+            const statusLabel =
+                statusLabels[match.status] ||
+                match.status;
+
+
+            // ==========================================
+            // DATE
+            // ==========================================
+
+            const date =
+                match.scheduled_at
+                    ? new Date(
+                        match.scheduled_at
+                    ).toLocaleString(
+                        "fr-FR"
+                    )
+                    : "Date non définie";
+
+
+            // ==========================================
+            // GAGNANT
+            // ==========================================
+
+            let winnerName = "";
+
+            if (match.winner_id) {
+
+                const winnerParticipant =
+                    (
+                        match.duel_event_match_participants ||
+                        []
+                    ).find(
+                        participant =>
+                            Number(
+                                participant.member_id
+                            ) ===
+                            Number(
+                                match.winner_id
+                            )
+                    );
+
+                if (winnerParticipant) {
+
+                    winnerName =
+                        winnerParticipant.members?.username ||
+                        "";
+
+                }
+
+            }
+
+
+            // ==========================================
+            // AFFICHAGE
+            // ==========================================
+
+            item.innerHTML = `
+
+                <strong>
+                    ${match.format}
+                </strong>
+
+                <span>
+                    ${participantsDisplay}
+                </span>
+
+                <span>
+                    Thème :
+                    ${match.theme || "Aucun thème"}
+                </span>
+
+                <span>
+                    Date :
+                    ${date}
+                </span>
+
+                <span>
+                    Statut :
+                    ${statusLabel}
+                </span>
+
+                ${
+                    winnerName
+                        ? `
+                            <span>
+                                🏆 Gagnant :
+                                ${winnerName}
+                            </span>
+                        `
+                        : ""
+                }
+
+                ${
+                    match.cancel_reason
+                        ? `
+                            <span>
+                                Motif :
+                                ${match.cancel_reason}
+                            </span>
+                        `
+                        : ""
+                }
+
+            `;
+
+            matchesContainer.appendChild(
+                item
+            );
+
+        });
+
+    }
+
+}
+
+});
+
+
+closeDuelModal?.addEventListener("click", () => {
+
+    duelModal.classList.remove("active");
+    document.body.classList.remove("duel-modal-open");
+
+});
+
+
+duelModal?.addEventListener("click", (event) => {
+
+    if (event.target === duelModal) {
+
+        duelModal.classList.remove("active");
+        document.body.classList.remove("duel-modal-open");
+
+    }
+
+});

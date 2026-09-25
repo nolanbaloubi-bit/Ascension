@@ -19,9 +19,81 @@
         <p>Classement des dessinateurs</p>
     </header>
 
-    <a href="reglement.html" class="rules-button">
-    Règlement
+
+
+    <a href="#" id="duel-event-btn" class="duel-event-btn">
+    ⚔️ Duel
+    <span id="duel-event-notification"></span>
 </a>
+
+    <a href="reglement.html" class="rules-button">
+        Règlement
+    </a>
+
+
+<!-- POPUP DUEL -->
+<div id="duel-modal" class="duel-modal">
+
+    <div class="duel-modal-content">
+
+        <button
+            id="close-duel-modal"
+            class="duel-modal-close"
+            type="button"
+        >
+            ×
+        </button>
+
+        <h2 id="duel-modal-name">
+            Événement Duel
+        </h2>
+
+        <div id="duel-modal-status"></div>
+
+        <div class="duel-event-info">
+
+            <div>
+                <span>Thème</span>
+                <strong id="duel-modal-theme">
+                    —
+                </strong>
+            </div>
+
+            <div>
+                <span>Mise</span>
+                <strong id="duel-modal-stake">
+                    —
+                </strong>
+            </div>
+
+            <div>
+                <span>Participants</span>
+                <strong id="duel-modal-participant-count">
+                    —
+                </strong>
+            </div>
+
+        </div>
+
+        <h3>Participants</h3>
+
+        <div id="duel-modal-participants">
+            Chargement...
+        </div>
+
+        <h3>duels</h3>
+
+        <div id="duel-modal-matches">
+            Chargement...
+        </div>
+
+    </div>
+
+</div>
+
+
+
+</div>
 
     <main>
         <section class="ranking">
